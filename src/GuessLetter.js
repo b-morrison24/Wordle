@@ -1,5 +1,5 @@
-export default function GuessLetter({currLetter}) {
+export default function GuessLetter() {
     return (
-        <div className="guess_letter">{currLetter}</div>
+        <div className="guess_letter">A</div>
     )
 }

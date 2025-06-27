@@ -1,15 +1,16 @@
 import GuessLetter from "./GuessLetter"
 
-export default function Guess({currLetter}) {
-    //Guess should get input from Keyboard
+export default function Guess({lettersArr}) {
+    // Guess should get input from Keyboard (currLetter, guessIndex)
+    // guessNumber == guessId
 
     return (
         <div className="guess_container">
-            <GuessLetter currLetter={currLetter}></GuessLetter>
-            <GuessLetter></GuessLetter>
-            <GuessLetter></GuessLetter>
-            <GuessLetter></GuessLetter>
-            <GuessLetter></GuessLetter>
+            {
+                lettersArr.map((letter) => (
+                    <div className="guess_letter">{letter}</div>
+                ))
+            }
         </div>
     )
 }
