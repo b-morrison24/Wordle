@@ -1,4 +1,4 @@
-import GuessLetter from "./GuessLetter"
+import Key from "./Key"
 
 export default function Guess({lettersArr}) {
     // Guess should get input from Keyboard (currLetter, guessIndex)
