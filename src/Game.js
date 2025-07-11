@@ -3,12 +3,14 @@ import Board from "./Board";
 import Keyboard from "./Keyboard";
 
 export default function Game() {
+  const WORD_LENGTH = 5
   // How to keep track of what letter is being guessed
   const [letterIndex, setLetterIndex] = useState(0)
 
   // Keep track of guess (updated when enter is clicked and word is valid)
   const [guessNumber, setGuessNumber] = useState(0)
 
+  // TODO: Look into dynamic creation for more guesses
   const [guessArr, setGuessArr] = useState(
   [
       {id: 0, letters: ["","","","",""]},
@@ -18,21 +20,29 @@ export default function Game() {
       {id: 4, letters: ["","","","",""]},
   ])
 
+  const words = ["BEANS", "PLANE", "PIGGY","ZZZZZ"]
+  //const winningWord = "BEANS"
+
   const handleKeyClicked = (key) => {
-    // if key is enter, check if word is valid and update guess number
-    // if key is delete, check bounds of letter index and decrease by one
-    // else, update letter
-    if (key === "Backspace") {
-      handleBackspace();
-    } else if (key === "Enter") {
-      handleSubmittedGuess();
-    } else if (/^[A-Z]$/.test(key)) {
-      handleLetterInput(key);
+    // Reached max number of guesses, no more input allowed
+    if (guessNumber !== 5) {
+      // if key is enter, check if word is valid and update guess number
+      // if key is backspace, check bounds of letter index and decrease by one
+      // else, update letter within a guess
+      if (key === "Backspace") {
+        handleBackspace();
+      } else if (key === "Enter") {
+        handleSubmittedGuess();
+      } else if (/^[A-Z]$/.test(key)) {
+        handleLetterInput(key);
+      }
     }
   }
 
   const handleLetterInput = (key) => {
-    if (letterIndex === 5) return 
+    // Max number of letters in a guess reached
+    if (letterIndex === WORD_LENGTH) return
+
     setGuessArr(prevGuessArr => prevGuessArr.map((guess) => {
         if (guessNumber === guess.id) {
             const newLetters = [...guess.letters]
@@ -42,7 +52,7 @@ export default function Game() {
         return guess
     }))
 
-    setLetterIndex((prevLetterIndex) => Math.min(prevLetterIndex + 1, 5))
+    setLetterIndex((prevLetterIndex) => Math.min(prevLetterIndex + 1, WORD_LENGTH))
   }
 
   const handleBackspace = () => {
@@ -62,7 +72,33 @@ export default function Game() {
   }
 
   const handleSubmittedGuess = () => {
-    return
+    //validate guess (word needs to be 5 letters and exist in dictionary)
+    if (validateGuess()) {
+      // compare each letter in guess to winning word
+      compareGuess();
+    }
+  }
+
+  const validateGuess = () => {
+    if (letterIndex !== WORD_LENGTH) {
+      alert("Not enough letters")
+      return false
+    } else if (!words.includes(guessArr[guessNumber].letters.join(''))) {
+      alert("Not in word list")
+      return false
+    } else {
+      return true
+    }
+  }
+
+  // TODO: Decide what to do on last guess and what a guess returns
+  const compareGuess = () => {
+    // Compare each letter in guess to each letter in winning word
+
+    // move to next guess, reset letter index
+    setGuessNumber(prevGuessNumber => Math.min(prevGuessNumber + 1, 5))
+    setLetterIndex(0)
+    console.log(guessArr[guessNumber].letters.join(''));
   }
 
   return (
