@@ -17,6 +17,5 @@
 }
 
 .keyboard_container {
-    display: flex;
-    justify-content: center;
+    text-align: center;
 }
