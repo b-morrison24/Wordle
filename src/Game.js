@@ -13,15 +13,45 @@ export default function Game() {
   // TODO: Look into dynamic creation for more guesses
   const [guessArr, setGuessArr] = useState(
   [
-      {id: 0, letters: ["","","","",""]},
-      {id: 1, letters: ["","","","",""]},
-      {id: 2, letters: ["","","","",""]},
-      {id: 3, letters: ["","","","",""]},
-      {id: 4, letters: ["","","","",""]},
+      {id: 0, letters: [
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+      ]},
+      {id: 1, letters: [
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+      ]},
+      {id: 2, letters: [
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+      ]},
+      {id: 3, letters: [
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+      ]},
+      {id: 4, letters: [
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+        {value: "", status: "unused"},
+      ]},
   ])
 
   const words = ["BEANS", "PLANE", "PIGGY","ZZZZZ"]
-  //const winningWord = "BEANS"
+  const winningWord = "BEANS"
 
   const handleKeyClicked = (key) => {
     // Reached max number of guesses, no more input allowed
@@ -45,8 +75,8 @@ export default function Game() {
 
     setGuessArr(prevGuessArr => prevGuessArr.map((guess) => {
         if (guessNumber === guess.id) {
-            const newLetters = [...guess.letters]
-            newLetters[letterIndex] = key
+            const newLetters = guess.letters
+            newLetters[letterIndex].value = key
             return {...guess, letters: newLetters}
         }
         return guess
@@ -63,7 +93,7 @@ export default function Game() {
           // // guess.letters.with(letterIndex - 1, "") is the same as the following 2 lines:
           // // const newLetters = [...guess.letters]
           // // newLetters[letterIndex - 1] = ""
-          return {...guess, letters: guess.letters.with(letterIndex - 1, "")}
+          return {...guess, letters: guess.letters.with(letterIndex - 1, {value: "", status: "unused"})}
         }
         return guess
     }))
@@ -74,7 +104,6 @@ export default function Game() {
   const handleSubmittedGuess = () => {
     //validate guess (word needs to be 5 letters and exist in dictionary)
     if (validateGuess()) {
-      // compare each letter in guess to winning word
       compareGuess();
     }
   }
@@ -83,7 +112,7 @@ export default function Game() {
     if (letterIndex !== WORD_LENGTH) {
       alert("Not enough letters")
       return false
-    } else if (!words.includes(guessArr[guessNumber].letters.join(''))) {
+    } else if (!words.includes(guessArr[guessNumber].letters.map(letter => letter.value).join(''))) {
       alert("Not in word list")
       return false
     } else {
@@ -92,13 +121,21 @@ export default function Game() {
   }
 
   // TODO: Decide what to do on last guess and what a guess returns
+  // TODO: Add status to keyboard
   const compareGuess = () => {
     // Compare each letter in guess to each letter in winning word
+    guessArr[guessNumber].letters.map((letter, ind) => {
+      if (winningWord.includes(letter.value)) {
+        letter.status = (winningWord.indexOf(letter.value) === ind) ? "correct" : "misplaced"
+      } else {
+        letter.status = "incorrect"
+      }
+      return letter.value
+    });
 
     // move to next guess, reset letter index
     setGuessNumber(prevGuessNumber => Math.min(prevGuessNumber + 1, 5))
     setLetterIndex(0)
-    console.log(guessArr[guessNumber].letters.join(''));
   }
 
   return (
