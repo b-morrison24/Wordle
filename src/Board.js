@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import Guess from "./Guess";
 
 export default function Board({guessArr}) {

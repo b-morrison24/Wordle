@@ -50,6 +50,8 @@ export default function Game() {
       ]},
   ])
 
+  const [statusObj, setStatusObj] = useState({})
+
   const words = ["BEANS", "PLANE", "PIGGY","ZZZZZ"]
   const winningWord = "BEANS"
 
@@ -90,9 +92,6 @@ export default function Game() {
 
     setGuessArr(prevGuessArr => prevGuessArr.map((guess) => {
         if (guessNumber === guess.id) {
-          // // guess.letters.with(letterIndex - 1, "") is the same as the following 2 lines:
-          // // const newLetters = [...guess.letters]
-          // // newLetters[letterIndex - 1] = ""
           return {...guess, letters: guess.letters.with(letterIndex - 1, {value: "", status: "unused"})}
         }
         return guess
@@ -121,17 +120,33 @@ export default function Game() {
   }
 
   // TODO: Decide what to do on last guess and what a guess returns
-  // TODO: Add status to keyboard
   const compareGuess = () => {
-    // Compare each letter in guess to each letter in winning word
-    guessArr[guessNumber].letters.map((letter, ind) => {
-      if (winningWord.includes(letter.value)) {
-        letter.status = (winningWord.indexOf(letter.value) === ind) ? "correct" : "misplaced"
-      } else {
-        letter.status = "incorrect"
-      }
-      return letter.value
-    });
+    const newStatusObj = {...statusObj}
+
+    setGuessArr(prevGuessArr => {
+      return prevGuessArr.map((guess, guessIdx) => {
+        // Only update the current guess row
+        if (guessIdx !== guessNumber) return guess;
+
+        // For the current guess, update letters with status
+        const updatedLetters = guess.letters.map((letter, letterIdx) => {
+          const isCorrect = winningWord[letterIdx] === letter.value;
+          const isMisplaced = !isCorrect && winningWord.includes(letter.value);
+          const letterStatus = isCorrect ? "correct" : isMisplaced ? "misplaced" : "incorrect"
+
+          newStatusObj[letter.value] = letterStatus
+
+          return {
+            ...letter,
+            status: letterStatus,
+          };
+        });
+
+        return { ...guess, letters: updatedLetters };
+      })
+    })
+
+    setStatusObj(newStatusObj)
 
     // move to next guess, reset letter index
     setGuessNumber(prevGuessNumber => Math.min(prevGuessNumber + 1, 5))
@@ -141,7 +156,7 @@ export default function Game() {
   return (
     <div className="game_container">
       <Board guessArr={guessArr}></Board>
-      <Keyboard onKeyClicked={handleKeyClicked}></Keyboard>
+      <Keyboard onKeyClicked={handleKeyClicked} letterStatus={statusObj}></Keyboard>
     </div>
   );
 }
