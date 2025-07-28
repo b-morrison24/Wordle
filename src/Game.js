@@ -1,72 +1,48 @@
 import { useState } from "react";
+import { generate } from 'random-words';
+
 import Board from "./Board";
 import Keyboard from "./Keyboard";
 
 export default function Game() {
   const WORD_LENGTH = 5
+  const MAX_GUESSES = 6
+  const words = generate({ exactly: 9000, minLength:5, maxLength: 5, formatter: (word) =>  word.toUpperCase()})
+
   // How to keep track of what letter is being guessed
   const [letterIndex, setLetterIndex] = useState(0)
 
   // Keep track of guess (updated when enter is clicked and word is valid)
   const [guessNumber, setGuessNumber] = useState(0)
 
-  // TODO: Look into dynamic creation for more guesses
-  const [guessArr, setGuessArr] = useState(
-  [
-      {id: 0, letters: [
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-      ]},
-      {id: 1, letters: [
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-      ]},
-      {id: 2, letters: [
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-      ]},
-      {id: 3, letters: [
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-      ]},
-      {id: 4, letters: [
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-        {value: "", status: "unused"},
-      ]},
-  ])
+  // TODO: move winning word to backend for anti-cheating
+  const [winningWord, setWinningWord] = useState(words[Math.floor(Math.random() * words.length)])
 
+  const getInitialGuessArray = (numOfGuesses, word_length) => {
+    return Array.from({length: numOfGuesses}, (_, id) => ({
+      id,
+      letters: Array.from({length: word_length}, () => ({
+        value: "",
+        status: "unused"
+      }))
+    }))
+  }
+
+  const [guessArr, setGuessArr] = useState(getInitialGuessArray(MAX_GUESSES, WORD_LENGTH))
   const [statusObj, setStatusObj] = useState({})
-
-  const words = ["BEANS", "PLANE", "PIGGY","ZZZZZ"]
-  const winningWord = "BEANS"
 
   const handleKeyClicked = (key) => {
     // Reached max number of guesses, no more input allowed
-    if (guessNumber !== 5) {
+    if (guessNumber !== MAX_GUESSES) {
       // if key is enter, check if word is valid and update guess number
       // if key is backspace, check bounds of letter index and decrease by one
       // else, update letter within a guess
       if (key === "Backspace") {
         handleBackspace();
       } else if (key === "Enter") {
-        handleSubmittedGuess();
+        handleSubmittedGuess()
       } else if (/^[A-Z]$/.test(key)) {
-        handleLetterInput(key);
+        handleLetterInput(key)
       }
     }
   }
@@ -101,9 +77,9 @@ export default function Game() {
   }
 
   const handleSubmittedGuess = () => {
-    //validate guess (word needs to be 5 letters and exist in dictionary)
+    //validate guess (word needs to be exactly 5 letters)
     if (validateGuess()) {
-      compareGuess();
+      updateGame();
     }
   }
 
@@ -111,16 +87,12 @@ export default function Game() {
     if (letterIndex !== WORD_LENGTH) {
       alert("Not enough letters")
       return false
-    } else if (!words.includes(guessArr[guessNumber].letters.map(letter => letter.value).join(''))) {
-      alert("Not in word list")
-      return false
     } else {
       return true
     }
   }
 
-  // TODO: Decide what to do on last guess and what a guess returns
-  const compareGuess = () => {
+  const updateGame = () => {
     const newStatusObj = {...statusObj}
 
     setGuessArr(prevGuessArr => {
@@ -148,9 +120,35 @@ export default function Game() {
 
     setStatusObj(newStatusObj)
 
+    if (winningWord === guessArr[guessNumber].letters.map(letter => letter.value).join('')) {
+      alert("You WON")
+      resetGame()
+      return
+    }
+
     // move to next guess, reset letter index
-    setGuessNumber(prevGuessNumber => Math.min(prevGuessNumber + 1, 5))
+    setGuessNumber(prevGuessNumber => Math.min(prevGuessNumber + 1, MAX_GUESSES))
+    
+    if (guessNumber === MAX_GUESSES-1) {
+      alert("Sorry, you didn't win this time. Please try again.")
+      resetGame()
+    }
     setLetterIndex(0)
+  }
+
+  const resetGame = () => {
+    setWinningWord(words[Math.floor(Math.random() * words.length)])
+    setLetterIndex(0)
+    setGuessNumber(0)
+    setGuessArr(getInitialGuessArray(MAX_GUESSES, WORD_LENGTH))
+
+    const newStatusObj = statusObj
+
+    for(const key in newStatusObj) {
+      newStatusObj[key] = "unused"
+    }
+
+    setStatusObj(newStatusObj)
   }
 
   return (
