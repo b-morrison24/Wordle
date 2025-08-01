@@ -153,7 +153,7 @@ export default function Game() {
     setGuessNumber(0)
     setGuessArr(getInitialGuessArray(MAX_GUESSES, WORD_LENGTH))
 
-    const newStatusObj = statusObj
+    const newStatusObj = {}
 
     for (const key in newStatusObj) {
       newStatusObj[key] = "unused"
