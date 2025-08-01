@@ -97,36 +97,37 @@ export default function Game() {
     const letterCounts = {}
 
     // Need to also check duplicate letters in guess and winning word
-    winningWord.split('').forEach(letter => letterCounts[letter] = (letterCounts[letter] || 0) + 1)
+    winningWord.split('').forEach((letter, idx) => {
+      if (letter !== guessArr[guessNumber].letters[idx].value) {
+        letterCounts[letter] = (letterCounts[letter] || 0) + 1
+      }
+    })
+
+    // For the current guess, update letters with status
+    const updatedLetters = guessArr[guessNumber].letters.map((letter, letterIdx) => {
+      const value = letter.value
+      let letterStatus = "incorrect"
+
+      if (value === winningWord[letterIdx]) {
+        letterStatus = "correct"
+      } else if (letterCounts[value] > 0) {
+        letterStatus = "misplaced"
+        letterCounts[value]--
+      }
+
+      newStatusObj[value] = letterStatus
+
+      return {
+        ...letter,
+        status: letterStatus,
+      }
+    })
 
     setGuessArr(prevGuessArr => {
-      return prevGuessArr.map((guess, guessIdx) => {
+      return prevGuessArr.map((guess, guessIdx) =>
         // Only update the current guess row
-        if (guessIdx !== guessNumber) return guess
-
-        // For the current guess, update letters with status
-        const updatedLetters = guess.letters.map((letter, letterIdx) => {
-          const value = letter.value
-          let letterStatus = "incorrect"
-
-          if (value === winningWord[letterIdx]) {
-            letterStatus = "correct"
-            letterCounts[value]--
-          } else if (letterCounts[value] > 0) {
-            letterStatus = "misplaced"
-            letterCounts[value]--
-          }
-
-          newStatusObj[letter.value] = letterStatus
-
-          return {
-            ...letter,
-            status: letterStatus,
-          }
-        })
-
-        return { ...guess, letters: updatedLetters }
-      })
+        guessIdx === guessNumber ? { ...guess, letters: updatedLetters } : guess
+      )
     })
 
     setStatusObj(newStatusObj)
