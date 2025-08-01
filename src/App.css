@@ -1,38 +1,52 @@
-.App {
-  text-align: center;
+body {
+    background-color: #121213;
+}
+.game_container {
+    margin-top: 5%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.guess_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.guess_letter {
+    border: 1px solid grey;
+    color: #ffffff;
+    align-content: center;
+    text-align: center;
+    min-width: 75px;
+    min-height: 75px;
+    font-size: xx-large;
+    font-family: sans-serif;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.keyboard_container {
+    text-align: center;
 }
 
-.App-link {
-  color: #61dafb;
+.key {
+    width: 3%;
+    margin: 0 auto;
+    background-color: #818384;
+    color: #ffffff;
+    font-size: x-large;
+    font-family: sans-serif;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Enter, .Backspace {
+    width: 10%;
+}
+
+.correct {
+    background-color: #399c39;
+}
+
+.misplaced {
+    background-color: #CB9D06;
+}
+
+.incorrect {
+    background-color: #3f3e3e;
 }
