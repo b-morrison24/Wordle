@@ -94,6 +94,10 @@ export default function Game() {
 
   const updateGame = () => {
     const newStatusObj = { ...statusObj }
+    const letterCounts = {}
+
+    // Need to also check duplicate letters in guess and winning word
+    winningWord.split('').forEach(letter => letterCounts[letter] = (letterCounts[letter] || 0) + 1)
 
     setGuessArr(prevGuessArr => {
       return prevGuessArr.map((guess, guessIdx) => {
@@ -102,9 +106,16 @@ export default function Game() {
 
         // For the current guess, update letters with status
         const updatedLetters = guess.letters.map((letter, letterIdx) => {
-          const isCorrect = winningWord[letterIdx] === letter.value
-          const isMisplaced = !isCorrect && winningWord.includes(letter.value)
-          const letterStatus = isCorrect ? "correct" : isMisplaced ? "misplaced" : "incorrect"
+          const value = letter.value
+          let letterStatus = "incorrect"
+
+          if (value === winningWord[letterIdx]) {
+            letterStatus = "correct"
+            letterCounts[value]--
+          } else if (letterCounts[value] > 0) {
+            letterStatus = "misplaced"
+            letterCounts[value]--
+          }
 
           newStatusObj[letter.value] = letterStatus
 
@@ -121,7 +132,7 @@ export default function Game() {
     setStatusObj(newStatusObj)
 
     if (winningWord === guessArr[guessNumber].letters.map(letter => letter.value).join('')) {
-      alert("You WON")
+      alert("You won!")
       resetGame()
       return
     }
