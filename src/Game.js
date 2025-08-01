@@ -52,12 +52,13 @@ export default function Game() {
     if (letterIndex === WORD_LENGTH) return
 
     setGuessArr(prevGuessArr => prevGuessArr.map((guess) => {
-      if (guessNumber === guess.id) {
-        const newLetters = guess.letters
-        newLetters[letterIndex].value = key
-        return { ...guess, letters: newLetters }
-      }
-      return guess
+      if (guessNumber !== guess.id) return guess
+
+      const updatedLetters = guess.letters.map((letter, idx) =>
+        idx === letterIndex ? {...letter, value: key} : letter
+      )
+
+      return { ...guess, letters: updatedLetters }
     }))
 
     setLetterIndex((prevLetterIndex) => Math.min(prevLetterIndex + 1, WORD_LENGTH))
